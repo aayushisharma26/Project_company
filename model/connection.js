@@ -3,14 +3,15 @@ const knex=require('knex')({
     connection:{
         host:'127.0.0.1',
         user:'root',
-        password:'Savita@123',
-        database: 'Deatils'
+        password:'Pooja@123',
+        database: 'Details'
     }
 })
 
 knex.schema.hasTable('nisway_project').then(function(exists) {
     if (!exists) {
       return knex.schema.createTable('nisway_project', function(t) {
+        t.increments('user_id').primary();
         t.string('Date',255);
         t.string('Age', 255);
         t.string('Industry', 255);

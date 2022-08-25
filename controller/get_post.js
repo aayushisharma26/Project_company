@@ -2,32 +2,14 @@ var knex=require("../model/connection")
 const bodyparser=require("body-parser")
 var meraki_data=require("../csvjson.json");
 const fs=require("fs")
+var req=require("readline-sync")
+var choice_of_field=req.question("Which field you want to sort from given data :  ")
+
+
 
 const get_method=(req,res)=>{
     res.json(meraki_data)
 }
-const post_method=(req,res)=>{
-    const data={
-        Date: req.body.Date,
-        Age: req.body.Age,
-        Industry: req.body.Industry,
-        Jobtitle: req.body.Jobtitle,
-        Annualsalary:req.body.Annualsalary,
-        Currency: req.body.Currency,
-        Location:req.body.Location,
-        Experience: req.body.Experience,
-        AdditionalContext: req.body.AdditionalContext,
-        OtherCurrency:req .body.OtherCurrency
-    }
-    knex('nisway_project').insert( data).then(()=>{
-        fs.writeFileSync("csvjson.json",JSON.stringify(meraki_data,null,3))  
-        res.send({message:"data post successfully"})
-        console.log("Data inserted")
-    }).catch((err)=>{
-        console.log("Data does not inserted")
-    })
-}
-
 
 
 
@@ -39,31 +21,13 @@ const getdata_by_Industry=(req,res)=>{
     })
 }
 
-
-
-
-const put_method=(req,res) =>{
-    knex.from("nisway_project").where("Age","=",req.params.Age)
-    .update({   Date: req.body.Date,
-        Age: req.body.Age,
-        Industry: req.body.Industry,
-        Jobtitle: req.body.Jobtitle,
-        Annualsalary:req.body.Annualsalary,
-        Currency: req.body.Currency,
-        Location:req.body.Location,
-        Experience: req.body.Experience,
-        AdditionalContext: req.body.AdditionalContext,
-        OtherCurrency:req .body.OtherCurrency
-
-                })
+const get_singlerecord=(req,res)=>{
+    knex('nisway_project').select("*").where({user_id:req.params.user_id})
     .then((data)=>{
-        fs.writeFileSync("csvjson.json",JSON.stringify(meraki_data,null,3))  
-        res.send("data updated")
-    }).catch((err)=>{
-        console.log(err)
-    })
-    }
+        res.send(data)
 
+    })
+}
 
 
 
@@ -78,8 +42,25 @@ const deleted=(req,res)=>{
     })
 }
 
+const sort=(req,res)=>{
+
+    knex
+  .select()
+  .table('nisway_project')
+  .orderBy(choice_of_field, 'desc')
+    .then((data)=>{
+        res.send(data)
+    }).catch((err)=>{
+        res.send({message:err})
+    })
+}
+
+
+
 module.exports={get_method,
             post_method,
             getdata_by_Industry,
             put_method,
-            deleted}
+            deleted
+                ,sort,
+            get_singlerecord}
